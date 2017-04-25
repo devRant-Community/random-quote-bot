@@ -49,10 +49,16 @@ class Bot {
 		$json = file_get_contents('http://quotes.stormconsultancy.co.uk/random.json');
 
 		// Decode it to an array
-		$array = json_decode($json, true);
+		$quotedata = json_decode($json, true);
+
+		// Clean quote
+		$quotedata["quote"] = str_replace(['“', '”', '"'], "'", $quotedata["quote"]);
+
+		// Format the quote
+		$quote = "\"{$quotedata["quote"]}\" - {$quotedata["author"]}";
 
 		// Return it
-		return $array;
+		return $quote;
 	}
 }
 

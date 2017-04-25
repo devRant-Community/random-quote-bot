@@ -5,8 +5,7 @@
 include("main.php");
 
 $bot = new Bot(0, "-", 0); // token_id: 0, token_key: "", user_id: 0   ---> No login data for you :)
-$quotedata = $bot->getQuote();
-$quote = "\"{$quotedata["quote"]}\" - {$quotedata["author"]}";
+$quote = $bot->getQuote();
 $bot->post($quote);
 
 ?>
