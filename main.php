@@ -5,17 +5,41 @@ class Bot {
 	private $token_key = "";
 	private $user_id = 0;
 
-	function __construct($token_id, $token_key, $user_id){
+	private $store = "quoteids.json";
+	private $quoteids = [];
+
+	function __construct($token_id, $token_key, $user_id) {
 		// Some configuration for the getQuote function
 		if(ini_get("allow_url_fopen") != 1)
 			ini_set("allow_url_fopen", 1);
 
+		// Get already posted quotes
+		$json = file_get_contents($this->store);
+		$this->quoteids = json_decode($rawjson, true);
+
+		// Set vars
 		$this->token_id = $token_id;
 		$this->token_key = $token_key;
 		$this->user_id = $user_id;
 	}
 
-	function post($msg){
+	function run($quotedata) {
+		/* Main function */
+
+		// Get quote and check if the post already exists
+		do {
+			$quotedata = $this->getQuote();
+		} while($this->checkRepost($quotedata["id"]));
+
+		// Post quote
+		$this->post($quotedata["msg"]);
+
+		// Save quote ID
+		array_push($this->quoteids, $quotedata["id"]);
+		$this->saveRespostIDs();
+	}
+
+	function post($msg) {
 		// The data to send
 		$postdata = [
 			"app" => 3,
@@ -44,7 +68,7 @@ class Bot {
 		return $response;
 	}
 
-	function getQuote(){
+	function getQuote() {
 		// Get the JSON from an API
 		$json = file_get_contents('http://quotes.stormconsultancy.co.uk/random.json');
 
@@ -55,10 +79,28 @@ class Bot {
 		$quotedata["quote"] = str_replace(['“', '”', '"'], "'", $quotedata["quote"]);
 
 		// Format the quote
-		$quote = "\"{$quotedata["quote"]}\" - {$quotedata["author"]}";
+		$quotemsg = "\"{$quotedata["quote"]}\" - {$quotedata["author"]}";
 
-		// Return it
-		return $quote;
+		// Get quote ID
+		$quoteid = $quotedata["id"];
+
+		// Return the data
+		return ["msg" => $quotemsg, "id" => $quoteid];
+	}
+
+	function checkRepost($quoteid) {
+		// Check if quote ID already exists
+		if(in_array($quoteid, $this->quoteids))
+			return true;
+		return false;
+	}
+
+	function saveRespostIDs() {
+		// Encode to JSON
+		$json = json_encode($this->quoteids);
+
+		// Save to file
+		file_put_contents($this->store, $json);
 	}
 }
 
