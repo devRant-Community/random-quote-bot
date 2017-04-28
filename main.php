@@ -15,7 +15,7 @@ class Bot {
 
 		// Get already posted quotes
 		$json = file_get_contents($this->store);
-		$this->quoteids = json_decode($rawjson, true);
+		$this->quoteids = json_decode($json, true);
 
 		// Set vars
 		$this->token_id = $token_id;
