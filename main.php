@@ -7,11 +7,13 @@ class Bot {
 
 	private $store = "quoteids.json";
 	private $quoteids = [];
+	private $quotes = [];
 
 	function __construct($token_id, $token_key, $user_id) {
 		// Some configuration for the getQuote function
 		if(ini_get("allow_url_fopen") != 1)
 			ini_set("allow_url_fopen", 1);
+		ignore_user_abort(true);
 
 		// Get already posted quotes
 		$json = file_get_contents($this->store);
@@ -26,17 +28,11 @@ class Bot {
 	function run($quotedata) {
 		/* Main function */
 
-		// Get quote and check if the post already exists
-		do {
-			$quotedata = $this->getQuote();
-		} while($this->checkRepost($quotedata["id"]));
+		// Get quote
+		$quote = $this->getQuote();
 
 		// Post quote
-		$this->post($quotedata["msg"]);
-
-		// Save quote ID
-		array_push($this->quoteids, $quotedata["id"]);
-		$this->saveRespostIDs();
+		$this->post($quote);
 	}
 
 	function post($msg) {
@@ -68,12 +64,26 @@ class Bot {
 		return $response;
 	}
 
-	function getQuote() {
+	function getQuotes() {
 		// Get the JSON from an API
-		$json = file_get_contents('http://quotes.stormconsultancy.co.uk/random.json');
+		$json = file_get_contents('http://quotes.stormconsultancy.co.uk/quotes.json');
 
 		// Decode it to an array
-		$quotedata = json_decode($json, true);
+		$allquotes = json_decode($json, true);
+
+		// If all available quotes are sent once, start again
+		if(count($allquotes) == count($this->quoteids)){
+			$this->quoteids = [];
+		}
+
+		// Get a random quote
+		do {
+			$quotedata = $allquotes[rand(0, count($allquotes))];
+		} while($this->checkRepost($quotedata["id"]));
+
+		// Save quote ID
+		array_push($this->quoteids, $quotedata["id"]);
+		$this->saveRespostIDs();
 
 		// Clean quote
 		$quotedata["quote"] = str_replace(['“', '”', '"'], "'", $quotedata["quote"]);
@@ -81,11 +91,8 @@ class Bot {
 		// Format the quote
 		$quotemsg = "\"{$quotedata["quote"]}\" - {$quotedata["author"]}";
 
-		// Get quote ID
-		$quoteid = $quotedata["id"];
-
 		// Return the data
-		return ["msg" => $quotemsg, "id" => $quoteid];
+		return $quotemsg;
 	}
 
 	function checkRepost($quoteid) {
