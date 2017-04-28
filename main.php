@@ -29,7 +29,7 @@ class Bot {
 		/* Main function */
 
 		// Get quote
-		$quote = $this->getQuote();
+		$quote = $this->getQuotes();
 
 		// Post quote
 		$this->post($quote);
