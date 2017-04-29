@@ -7,7 +7,6 @@ class Bot {
 
 	private $store = "quoteids.json";
 	private $quoteids = [];
-	private $quotes = [];
 
 	function __construct($token_id, $token_key, $user_id) {
 		// Some configuration for the getQuote function
@@ -25,7 +24,7 @@ class Bot {
 		$this->user_id = $user_id;
 	}
 
-	function run($quotedata) {
+	function run() {
 		/* Main function */
 
 		// Get quote
