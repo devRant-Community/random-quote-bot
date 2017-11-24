@@ -8,6 +8,9 @@ class Bot {
 	private $store = "quoteids.json";
 	private $quoteids = [];
 
+	private $quotesFile = "quotes.json";
+	private $quotes = [];
+
 	function __construct($token_id, $token_key, $user_id) {
 		// Some configuration for the getQuote function
 		if(ini_get("allow_url_fopen") != 1)
@@ -17,6 +20,9 @@ class Bot {
 		// Get already posted quotes
 		$json = file_get_contents($this->store);
 		$this->quoteids = json_decode($json, true);
+
+		// Get all quotes
+		$this->quotes = json_decode(file_get_contents('quotes.json'), true);
 
 		// Set vars
 		$this->token_id = $token_id;
@@ -35,6 +41,8 @@ class Bot {
 	}
 
 	function post($msg) {
+		echo "Send:\n$msg";
+		return;
 		// The data to send
 		$postdata = [
 			"app" => 3,
@@ -48,7 +56,7 @@ class Bot {
 		// Make data useable for request
 		$postdata = http_build_query($postdata);
 
-		$url = 'https://www.devrant.io/api/devrant/rants';
+		$url = 'https://www.devrant.com/api/devrant/rants';
 
 		// Curl options
 		$curl = curl_init($url);
@@ -64,24 +72,12 @@ class Bot {
 	}
 
 	function getQuotes() {
-		// Get the JSON from an API
-		$json = file_get_contents('http://quotes.stormconsultancy.co.uk/quotes.json');
-
-		// Decode it to an array
-		$allquotes = json_decode($json, true);
-
-		// If all available quotes are sent once, start again
-		if(count($allquotes) == count($this->quoteids)){
-			$this->quoteids = [];
-		}
-
-		// Get a random quote
-		do {
-			$quotedata = $allquotes[rand(0, count($allquotes))];
-		} while($this->checkRepost($quotedata["id"]));
+		// Get the next quote
+		$quoteNum = $this->nextQuote();
+		$quotedata = $this->quotes[$quoteNum];
 
 		// Save quote ID
-		array_push($this->quoteids, $quotedata["id"]);
+		array_push($this->quoteids, $quoteNum);
 		$this->saveRespostIDs();
 
 		// Clean quote
@@ -94,11 +90,8 @@ class Bot {
 		return $quotemsg;
 	}
 
-	function checkRepost($quoteid) {
-		// Check if quote ID already exists
-		if(in_array($quoteid, $this->quoteids))
-			return true;
-		return false;
+	function nextQuote() {
+		return count($this->quoteids);
 	}
 
 	function saveRespostIDs() {
