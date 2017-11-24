@@ -1,4 +1,4 @@
-# Storing which quotes have already been sent. Useless to upload because it will be created manually
+# Storing which quotes have already been sent. Useless to upload because it will be created automatically
 quoteids.json
 
 # Ugly written quote scraper
@@ -7,6 +7,6 @@ scrapeQuotes.php
 # All quotes. Won't upload to GitHub
 quotes.json
 
-# IDEs (switch to PHPStorm afterwards lol)
+# IDEs (switched to PHPStorm afterwards lol)
 .vscode
 .idea
