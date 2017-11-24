@@ -22,7 +22,7 @@ class Bot {
 		$this->quoteids = json_decode($json, true);
 
 		// Get all quotes
-		$this->quotes = json_decode(file_get_contents($quotesFile), true);
+		$this->quotes = json_decode(file_get_contents($this->quotesFile), true);
 
 		// Set vars
 		$this->token_id = $token_id;
