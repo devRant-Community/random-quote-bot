@@ -1,9 +1,9 @@
 <?php
 
 class Bot {
-	private $token_id = 0;
-	private $token_key = "";
-	private $user_id = 0;
+	private $token_id;
+	private $token_key;
+	private $user_id;
 
 	private $store = "quoteids.json";
 	private $quoteids = [];
@@ -11,7 +11,7 @@ class Bot {
 	private $quotesFile = "quotes.json";
 	private $quotes = [];
 
-	function __construct($token_id, $token_key, $user_id) {
+	function __construct($username, $password) {
 		// Some configuration for the getQuote function
 		if(ini_get("allow_url_fopen") != 1)
 			ini_set("allow_url_fopen", 1);
@@ -24,10 +24,8 @@ class Bot {
 		// Get all quotes
 		$this->quotes = json_decode(file_get_contents($this->quotesFile), true);
 
-		// Set vars
-		$this->token_id = $token_id;
-		$this->token_key = $token_key;
-		$this->user_id = $user_id;
+		// Login
+		$this->login($username, $password);
 	}
 
 	function run() {
@@ -41,8 +39,6 @@ class Bot {
 	}
 
 	function post($msg) {
-		echo "Send:\n$msg";
-		return;
 		// The data to send
 		$postdata = [
 			"app" => 3,
@@ -88,6 +84,36 @@ class Bot {
 
 		// Return the data
 		return $quotemsg;
+	}
+
+	function login($username, $password) {
+		// The data to send
+		$postdata = [
+			"app" => 3,
+			"plat" => 3,
+			"username" => $username,
+			"password" => $password
+		];
+
+		// Make data useable for request
+		$postdata = http_build_query($postdata);
+
+		$url = 'https://devrant.com/api/users/auth-token';
+
+		// Curl options
+		$curl = curl_init($url);
+		curl_setopt($curl, CURLOPT_POST, 1);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $postdata);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($curl, CURLOPT_HEADER, 0);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+		// Execute curl and get response
+		$response = json_decode(curl_exec($curl), true);
+
+		$this->token_id = $response["auth_token"]["id"];
+		$this->token_key = $response["auth_token"]["key"];
+		$this->user_id = $response["auth_token"]["user_id"];
 	}
 
 	function nextQuote() {
