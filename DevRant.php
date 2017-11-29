@@ -39,9 +39,6 @@ class DevRant {
 	}
 
 	function postRant($msg) {
-		echo $msg;
-		return;
-
 		// The data to send
 		$postdata = [
 			"app" => 3,
