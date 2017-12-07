@@ -24,6 +24,6 @@ class newYearBot {
 		/* Main function */
 
 		// Post quote
-		$this->devRant->postRant($this->newYearMsg);
+		$this->devRant->postRant($this->newYearMsg, "New Year");
 	}
 }

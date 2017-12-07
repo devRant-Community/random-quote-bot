@@ -38,12 +38,12 @@ class DevRant {
 		return $response;
 	}
 
-	function postRant($msg) {
+	function postRant($msg, $tags) {
 		// The data to send
 		$postdata = [
 			"app" => 3,
 			"rant" => $msg,
-			"tags" => "Random Quote",
+			"tags" => $tags,
 			"token_id" => $this->token_id,
 			"token_key" => $this->token_key,
 			"user_id" => $this->user_id

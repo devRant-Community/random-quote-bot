@@ -38,7 +38,7 @@ class RandomQuoteBot {
 		$quote = $this->getQuotes();
 
 		// Post quote
-		$this->devRant->postRant($quote);
+		$this->devRant->postRant($quote, "Random Quote");
 	}
 
 	function getQuotes() {
