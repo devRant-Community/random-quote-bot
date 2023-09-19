@@ -7,7 +7,7 @@
 A devRant bot that posts random quotes every day!
 
 > **Note**
-> This project was originally created by @skayo, but he has decided to transfer it to the devRant-Community organization.
+> This project was originally created by [@skayo](https://github.com/skayo), but he has decided to transfer it to the devRant-Community organization.
 
 
 ## Requirements
