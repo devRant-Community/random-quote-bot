@@ -13,6 +13,7 @@ A devRant bot that posts random quotes every day!
 ## Requirements
 
 - PHP 5.6
+- A lot of energy and willpower
 
 
 ## Directory Structure
